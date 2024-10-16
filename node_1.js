@@ -43,16 +43,6 @@ server.on("connection", async (socket, req) => {
                         theirTx.splice(0, 1);
                     }
 
-                    // console.log("\n============================================\n");
-                    // console.log("theirTx.length === 0 ", theirTx.length === 0);
-                    // console.log("SHA256(PolChain.getLastBlock().hash + newBlock.timestamp + JSON.stringify(newBlock.data) + newBlock.nonce) === newBlock.hash ", SHA256(PolChain.getLastBlock().hash + newBlock.timestamp + JSON.stringify(newBlock.data) + newBlock.nonce) === newBlock.hash);
-                    // console.log("newBlock.hash.startsWith(Array(PolChain.difficulty + 1).join('0')) ", newBlock.hash.startsWith(Array(PolChain.difficulty + 1).join("0")));
-                    // console.log("Block.hasValidTransactions(newBlock, PolChain) ", Block.hasValidTransactions(newBlock, PolChain));
-                    // console.log("(parseInt(newBlock.timestamp) > parseInt(PolChain.getLastBlock().timestamp) || PolChain.getLastBlock().timestamp === '') ", parseInt(newBlock.timestamp) > parseInt(PolChain.getLastBlock().timestamp) || PolChain.getLastBlock().timestamp === "");
-                    // console.log("parseInt(newBlock.timestamp) < Date.now() ", parseInt(newBlock.timestamp) < Date.now());
-                    // console.log("PolChain.getLastBlock().hash === newBlock.prevHash ", PolChain.getLastBlock().hash === newBlock.prevHash, PolChain.getLastBlock());
-                    // console.log("\n============================================\n");
-
                     if (
                         theirTx.length === 0 &&
                         SHA256(PolChain.getLastBlock().hash + newBlock.timestamp + JSON.stringify(newBlock.data) + newBlock.nonce) === newBlock.hash &&
@@ -137,8 +127,6 @@ server.on("connection", async (socket, req) => {
 
             case "TYPE_REQUEST_CHAIN":
                 const socket = opened.filter(node => node.address === _message.data)[0].socket;
-                console.log("Sending chain to ", _message.data);
-                console.log("chain length: ", PolChain.chain.length);
                 for (let i = 1; i < PolChain.chain.length; i++) {
                     socket.send(JSON.stringify(produceMessage(
                         "TYPE_SEND_CHAIN",
@@ -221,10 +209,15 @@ setTimeout(() => {
     transaction.sign(MINT_KEY_PAIR)
 
 	sendMessage(produceMessage("TYPE_CREATE_TRANSACTION", transaction));
-    PolChain.addTransaction(transaction);
+    // PolChain.addTransaction(transaction);
 
 }, 5000);
 
 setTimeout(() => {
+    sendMessage(produceMessage("TYPE_REQUEST_CHAIN", MY_ADDRESS));
+}, 12000);
+
+setTimeout(() => {
+    console.log("\n\n\n========================= RESULTS =========================\n");
     console.log(PolChain);
-}, 10000);
+}, 15000);

@@ -209,9 +209,10 @@ setTimeout(() => {
             PolChain.difficulty
         ]))
     }
-    sendMessage(produceMessage("TYPE_REQUEST_CHAIN", MY_ADDRESS));
+    // sendMessage(produceMessage("TYPE_REQUEST_CHAIN", MY_ADDRESS));
 }, 6500);
 
 setTimeout(() => {
+    console.log("\n\n\n========================= RESULTS =========================\n");
 	console.log(PolChain);
-}, 10000);
+}, 15000);
