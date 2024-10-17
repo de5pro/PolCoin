@@ -10,14 +10,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "braces": ">=3.0.3",
     "crypto-js": ">=4.2.0",
     "elliptic": "^6.5.7",
-    "savjeecoin": "^1.0.1",
-    "ws": "^8.18.0",
-    "braces": ">=3.0.3"
+    "node-cron": "^3.0.3",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0",
-    "braces": ">=3.0.3"
+    "braces": ">=3.0.3",
+    "nodemon": "^3.1.0"
   }
 }

@@ -7,9 +7,9 @@ const cron = require('node-cron');
 
 const MINT_PUBLIC_ADDRESS = "049245c3867215b8f4277c15a9bffee568dc4f5cb2c393f4b1263780aa5a4df0640c036dd69a1c93e5c189a28cbc6781aa6b87dc25be27e5bea0f1bcf25be7efcb";
 
-const PORT = 3000;
-const PEERS = [];
-const MY_ADDRESS = "ws://localhost:3000";
+const PORT = 3001;
+const PEERS = ["ws://localhost:3000"];
+const MY_ADDRESS = "ws://localhost:3001";
 const server = new WS.Server({ port: PORT });
 
 let opened = [], connected = [];
@@ -31,7 +31,7 @@ server.on("connection", async (socket, req) => {
                 const [ newBlock, newDiff ] = _message.data;
 
                 const ourTx = [...PolChain.transactions.map(tx => JSON.stringify(tx))];
-                const theirTx = [...newBlock.data.map(tx => JSON.stringify(tx))];
+                const theirTx = [...newBlock.data.filter(tx => tx.from !== MINT_PUBLIC_ADDRESS).map(tx => JSON.stringify(tx))];
                 const n = theirTx.length;
 
                 if (newBlock.prevHash !== PolChain.getLastBlock().prevHash) {
@@ -58,8 +58,8 @@ server.on("connection", async (socket, req) => {
                         PolChain.transactions = [...ourTx.map(tx => JSON.parse(tx))];
                     }
                 } else if (!checked.includes(JSON.stringify([newBlock.prevHash, PolChain.chain[PolChain.chain.length-2].timestamp || ""]))) {
-                    // Case to prevent racing conditions for block to be added
                     checked.push(JSON.stringify([PolChain.getLastBlock().prevHash, PolChain.chain[PolChain.chain.length-2].timestamp || ""]));
+
                     const position = PolChain.chain.length - 1;
 
                     checking = true;
@@ -128,6 +128,7 @@ server.on("connection", async (socket, req) => {
 
             case "TYPE_REQUEST_CHAIN":
                 const socket = opened.filter(node => node.address === _message.data)[0].socket;
+                
                 for (let i = 1; i < PolChain.chain.length; i++) {
                     socket.send(JSON.stringify(produceMessage(
                         "TYPE_SEND_CHAIN",
@@ -200,49 +201,24 @@ process.on("uncaughtException", err => console.log(err));
 
 PEERS.forEach(peer => connect(peer));
 
-setTimeout(() => {
-	const MINT_KEY_PAIR = ec.keyFromPrivate("0700a1ad28a20e5b2a517c00242d3e25a88d84bf54dce9e1733e6096e6d6495e", "hex");
 
-	const myKey = ec.keyFromPrivate('275d7d634cf9229b955094f17847b64762d9bd528b5ba6082ba64eb1fb1d2988')
-    const myWalletAddress = myKey.getPublic('hex')
+cron.schedule('*/10 * * * * *', () => {
+    if (PolChain.transactions.length !== 0) {
+        console.log(`${new Date().toLocaleString()} | Pending Transaction(s) found mining block...`);
+        PolChain.mineTransactions();
+        console.log(`${new Date().toLocaleString()} | Block successfully mined...`);
+        sendMessage(produceMessage("TYPE_UPDATE_CHAIN", [
+            PolChain.getLastBlock(),
+            PolChain.difficulty
+        ]))
+        PolChain.transactions = [];
+    }else{
+        console.log(`${new Date().toLocaleString()} | No pending transaction(s) found...`);
+    }
+});
 
-    const transaction = new Transaction(MINT_PUBLIC_ADDRESS, myWalletAddress, 1)
-    transaction.sign(MINT_KEY_PAIR)
-
-	sendMessage(produceMessage("TYPE_CREATE_TRANSACTION", transaction));
-}, 5000);
-
-setTimeout(() => {
-    sendMessage(produceMessage("TYPE_REQUEST_CHAIN", MY_ADDRESS));
-}, 12000);
-
-setTimeout(() => {
+cron.schedule('* * * * *', () => {
+    console.log(`${new Date().toLocaleString()} | Every minute...`);
     console.log("\n\n\n========================= RESULTS =========================\n");
-    console.log(PolChain);
-}, 15000);
-
-// cron.schedule('*/5 * * * * *', () => {
-//     console.log(`${new Date().toLocaleString()} | Simulating a transaction...`);
-//     const MINT_KEY_PAIR = ec.keyFromPrivate("0700a1ad28a20e5b2a517c00242d3e25a88d84bf54dce9e1733e6096e6d6495e", "hex");
-
-//     const myKey = ec.keyFromPrivate('275d7d634cf9229b955094f17847b64762d9bd528b5ba6082ba64eb1fb1d2988')
-//     const myWalletAddress = myKey.getPublic('hex')
-
-//     const transaction = new Transaction(MINT_PUBLIC_ADDRESS, myWalletAddress, Math.floor(Math.random() * 10))
-//     transaction.sign(MINT_KEY_PAIR)
-
-//     sendMessage(produceMessage("TYPE_CREATE_TRANSACTION", transaction));
-// });
-
-// cron.schedule('*/30 * * * * *', () => {
-//     console.log(`${new Date().toLocaleString()} | Updating chain...`);
-//     sendMessage(produceMessage("TYPE_REQUEST_CHAIN", MY_ADDRESS));
-// });
-
-// cron.schedule('* * * * *', () => {
-//     console.log(`${new Date().toLocaleString()} | Updating chain...`);
-//     sendMessage(produceMessage("TYPE_REQUEST_CHAIN", MY_ADDRESS));
-//     console.log(`${new Date().toLocaleString()} | Every minute...`);
-//     console.log("\n\n\n========================= RESULTS =========================\n");
-// 	console.log(PolChain);
-// });
+	console.log(PolChain);
+});
