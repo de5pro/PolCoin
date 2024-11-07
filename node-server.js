@@ -210,15 +210,15 @@ PEERS.forEach(peer => connect(peer));
 
 // API to generate a new wallet
 app.post('/generateNewWallet', (req, res) => {
-    const { email, password } = req.body;
+    const { npm, password } = req.body;
 
     // Validate input
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required.' });
+    if (!npm || !password) {
+        return res.status(400).json({ error: 'npm and password are required.' });
     }
 
     /*
-        ADD DATABASE LOGIC HERE TO STORE AND VALIDATE THE EMAIL AND PASSWORD
+        ADD DATABASE LOGIC HERE TO STORE AND VALIDATE THE NPM AND PASSWORD
     */
 
     // Generate key pair
@@ -229,7 +229,7 @@ app.post('/generateNewWallet', (req, res) => {
     // Return the generated keys
     res.status(200).json({
         message: 'Keys generated successfully',
-        email,
+        npm,
         publicKey,
         privateKey
     });
@@ -238,11 +238,11 @@ app.post('/generateNewWallet', (req, res) => {
 // API to validate new wallet
 app.post('/validateNewWallet', (req, res) => {
     try {
-        const { email, password, publicKey } = req.body;
+        const { npm, password, publicKey } = req.body;
 
         // Validate input
-        if (!email || !password || !publicKey) {
-            return res.status(400).json({ error: 'email, password, publicKey fields are required.' });
+        if (!npm || !password || !publicKey) {
+            return res.status(400).json({ error: 'npm, password, publicKey fields are required.' });
         }
         
         /*
