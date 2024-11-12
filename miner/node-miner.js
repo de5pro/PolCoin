@@ -1,3 +1,4 @@
+require('dotenv').config();
 const WS = require("ws");
 const { Blockchain, Transaction, Block, PolChain } = require('./blockchain.js');
 const crypto = require("crypto"), SHA256 = message => crypto.createHash("sha256").update(message).digest("hex");
