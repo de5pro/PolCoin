@@ -1,3 +1,4 @@
+require('dotenv').config();
 const WS = require("ws");
 const { Blockchain, Transaction, Block, PolChain } = require('./blockchain.js');
 const crypto = require("crypto"), SHA256 = message => crypto.createHash("sha256").update(message).digest("hex");
@@ -10,15 +11,16 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const HTTP_PORT = 5000; // Choose any port for the HTTP server
 
-const MINT_PUBLIC_ADDRESS = "049245c3867215b8f4277c15a9bffee568dc4f5cb2c393f4b1263780aa5a4df0640c036dd69a1c93e5c189a28cbc6781aa6b87dc25be27e5bea0f1bcf25be7efcb";
-const MINT_PRIVATE_ADDRESS = "0700a1ad28a20e5b2a517c00242d3e25a88d84bf54dce9e1733e6096e6d6495e"; // put in .env file later
+const HTTP_PORT = process.env.HTTP_PORT || 5000;
+const WS_PORT = process.env.WS_PORT || 3000;
+const PEERS = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
-const PORT = 3000;
-const PEERS = [];
-const MY_ADDRESS = "ws://localhost:3000";
-const server = new WS.Server({ port: PORT });
+const MY_ADDRESS = `ws://localhost:${WS_PORT}`;
+const MINT_PUBLIC_ADDRESS = process.env.MINT_PUBLIC_ADDRESS || "Unauthorized";
+const MINT_PRIVATE_ADDRESS = process.env.MINT_PRIVATE_ADDRESS || "Unauthorized";
+
+const server = new WS.Server({ port: WS_PORT });
 
 let opened = [], connected = [];
 let check = [];
@@ -26,7 +28,7 @@ let checked = [];
 let checking = false;
 let tempChain = new Blockchain();
 
-console.log("This PolChain node is listening on PORT", PORT);
+console.log("This PolChain node is listening on PORT", WS_PORT);
 
 server.on("connection", async (socket, req) => {
     socket.on("message", message => {
