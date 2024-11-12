@@ -6,20 +6,6 @@ const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 const cron = require('node-cron');
 const express = require('express');
-const os = require('os');
-
-function getLocalIP() {
-    const interfaces = os.networkInterfaces();
-    for (const interfaceName in interfaces) {
-        for (const iface of interfaces[interfaceName]) {
-            // Skip internal (loopback) addresses and non-IPv4 addresses
-            if (iface.family === 'IPv4' && !iface.internal) {
-                return iface.address; // Return the first external IPv4 address found
-            }
-        }
-    }
-    return 'No external IP found';
-}
 
 // Express server setup for HTTP API
 const app = express();
@@ -380,5 +366,5 @@ app.post('/createTransaction', (req, res) => {
 
 // Start the Express server
 app.listen(HTTP_PORT, () => {
-    console.log(`PolChain server is running on ${getLocalIP()}:${HTTP_PORT}`);
+    console.log("PolChain server is running on PORT", HTTP_PORT);
 });

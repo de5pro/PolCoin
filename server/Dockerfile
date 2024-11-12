@@ -17,7 +17,7 @@ COPY . .
 COPY .env .env
 
 # Expose the HTTP port and WebSocket port
-EXPOSE ${HTTP_PORT} ${WS_PORT}
+EXPOSE 5000 6000
 
 # Run the application
 CMD ["node", "node-server.js"]
