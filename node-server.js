@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const HTTP_PORT = process.env.HTTP_PORT || 5000;
-const WS_PORT = process.env.WS_PORT || 3000;
+const WS_PORT = process.env.WS_PORT || 6000;
 const PEERS = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
 const MY_ADDRESS = `ws://localhost:${WS_PORT}`;

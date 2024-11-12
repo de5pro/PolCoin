@@ -5,12 +5,13 @@ const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 const cron = require('node-cron');
 
-const MINT_PUBLIC_ADDRESS = "049245c3867215b8f4277c15a9bffee568dc4f5cb2c393f4b1263780aa5a4df0640c036dd69a1c93e5c189a28cbc6781aa6b87dc25be27e5bea0f1bcf25be7efcb";
+const WS_PORT = process.env.WS_PORT || 6001;
+const PEERS = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
-const PORT = 3001;
-const PEERS = ["ws://localhost:3000"];
-const MY_ADDRESS = "ws://localhost:3001";
-const server = new WS.Server({ port: PORT });
+const MY_ADDRESS = `ws://localhost:${WS_PORT}`;
+const MINT_PUBLIC_ADDRESS = process.env.MINT_PUBLIC_ADDRESS || "Unauthorized";
+
+const server = new WS.Server({ port: WS_PORT });
 
 let opened = [], connected = [];
 let check = [];
@@ -18,7 +19,7 @@ let checked = [];
 let checking = false;
 let tempChain = new Blockchain();
 
-console.log("This PolChain node is listening on PORT", PORT);
+console.log("This PolChain node is listening on PORT", WS_PORT);
 
 server.on("connection", async (socket, req) => {
     socket.on("message", message => {
