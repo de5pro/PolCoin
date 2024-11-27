@@ -9,7 +9,7 @@ const cron = require('node-cron');
 const WS_PORT = process.env.WS_PORT || 6001;
 const PEERS = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
-const MY_ADDRESS = `ws://localhost:${WS_PORT}`;
+const MY_ADDRESS = process.env.MY_ADDRESS || `ws://localhost:${WS_PORT}`;
 const MINT_PUBLIC_ADDRESS = process.env.MINT_PUBLIC_ADDRESS || "Unauthorized";
 
 const server = new WS.Server({ port: WS_PORT });
