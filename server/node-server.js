@@ -16,7 +16,7 @@ const HTTP_PORT = process.env.HTTP_PORT || 5000;
 const WS_PORT = process.env.WS_PORT || 6000;
 const PEERS = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
-const MY_ADDRESS = `ws://localhost:${WS_PORT}`;
+const MY_ADDRESS = process.env.MY_ADDRESS || `ws://localhost:${WS_PORT}`;
 const MINT_PUBLIC_ADDRESS = process.env.MINT_PUBLIC_ADDRESS || "Unauthorized";
 const MINT_PRIVATE_ADDRESS = process.env.MINT_PRIVATE_ADDRESS || "Unauthorized";
 
