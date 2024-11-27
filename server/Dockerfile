@@ -21,7 +21,7 @@ RUN npm install
 COPY --chown=node:node . .
 
 # Expose port 5000 for the application
-EXPOSE 5000 6000
+EXPOSE ${HTTP_PORT} ${WS_PORT}
 
 # Start the application
 CMD ["node", "node-server.js"]

@@ -17,7 +17,7 @@ COPY . .
 COPY .env .env
 
 # Expose the WebSocket port
-EXPOSE 6001
+EXPOSE ${WS_PORT}
 
 # Run the application
 CMD ["node", "node-miner.js"]
