@@ -6,6 +6,7 @@ const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 const cron = require('node-cron');
 const express = require('express');
+const path = require('path');
 
 // Express server setup for HTTP API
 const app = express();
@@ -209,6 +210,10 @@ function sendMessage(message) {
 process.on("uncaughtException", err => console.log(err));
 
 PEERS.forEach(peer => connect(peer));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // API to generate a new wallet
 app.post('/generateNewWallet', (req, res) => {
